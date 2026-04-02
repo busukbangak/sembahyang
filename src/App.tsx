@@ -1,69 +1,53 @@
-import { useEffect, useState } from 'react'
+import { useCurrentTime } from './hooks/useCurrentTime'
+import { usePrayerAPI } from './hooks/usePrayerAPI'
+import { PrayerHeaderSection } from './components/PrayerHeaderSection'
+import { PrayerTabsSection } from './components/PrayerTabsSection'
+import { PrayerCardSection } from './components/PrayerCardSection'
+import { CITY, COUNTRY, METHOD } from './config'
 
-type TimingsResponse = {
-  code: number
-  status: string
-  data: {
-    date: {
-      readable: string
-      hijri: {
-        day: string
-        month: {
-          en: string
-        }
-        year: string
-      }
-    }
-    timings: {
-      Fajr: string
-      Sunrise: string
-      Dhuhr: string
-      Asr: string
-      Maghrib: string
-      Isha: string
-    }
-  }
-}
 
 function App() {
-  const [text, setText] = useState('Loading Aladhan API...')
+  const { currentTime } = useCurrentTime()
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch(
-          'https://api.aladhan.com/v1/timingsByCity?city=Hamburg&country=Germany&method=3',
-        )
-        const data = (await res.json()) as TimingsResponse
+  const { prayerData, loading, error } = usePrayerAPI({
+    month: currentTime.getMonth() + 1,
+    year: currentTime.getFullYear(),
+    city: CITY,
+    country: COUNTRY,
+    method: METHOD
+  })
 
-        if (!res.ok || data.code !== 200) {
-          throw new Error('API request failed')
-        }
+  if (loading) {
+    return (
+      <main className="min-h-screen px-4 py-5 text-slate-900">
+        <div className="mx-auto max-w-sm rounded-2xl border border-slate-200 bg-white/85 p-4 text-sm text-slate-500">
+          Loading prayer data...
+        </div>
+      </main>
+    )
+  }
 
-        const t = data.data.timings
-        const hijri = `${data.data.date.hijri.day} ${data.data.date.hijri.month.en} ${data.data.date.hijri.year}`
+  if (error) {
+    return (
+      <main className="min-h-screen px-4 py-5 text-slate-900">
+        <div className="mx-auto max-w-sm rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+          {error}
+        </div>
+      </main>
+    )
+  }
 
-        setText(
-          [
-            `Date: ${data.data.date.readable}`,
-            `Hijri: ${hijri}`,
-            `Subh: ${t.Fajr}`,
-            `Sunrise: ${t.Sunrise}`,
-            `Dhuhr: ${t.Dhuhr}`,
-            `Asr: ${t.Asr}`,
-            `Maghrib: ${t.Maghrib}`,
-            `Isha: ${t.Isha}`,
-          ].join('\n'),
-        )
-      } catch {
-        setText('Failed to load Aladhan API data.')
-      }
-    }
+  return (
+    <main className="min-h-screen px-4 py-5 text-slate-900">
+      <div className="mx-auto max-w-sm">
+        <PrayerHeaderSection prayerData={prayerData} currentTime={currentTime} city={CITY} country={COUNTRY} />
 
-    load()
-  }, [])
+        <PrayerCardSection prayerData={prayerData} currentTime={currentTime} />
 
-  return (<main>{text}</main>)
+        <PrayerTabsSection prayerData={prayerData} currentTime={currentTime} />
+      </div>
+    </main>
+  )
 }
 
 export default App
