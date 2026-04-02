@@ -1,6 +1,6 @@
 
 import type { CalendarDay } from '../services/aladhanService'
-import { getDayDataByDayNumber, toWeekdayShort, toPrayerTimes } from '../utils/prayerUtils'
+import { getCurrentPrayerName, getDayDataByDayNumber, toCurrentMinutes, toWeekdayShort, toPrayerTimes } from '../utils/prayerUtils'
 import { useEffect, useMemo, useState } from 'react'
 import { getMondayFirstOffset } from '../utils/prayerUtils'
 import { PrayerDetailsCard } from './PrayerDetailsCard'
@@ -23,6 +23,8 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
   const fallbackDay = prayerData[0]
   const selectedData = getDayDataByDayNumber(prayerData, selectedDay) ?? fallbackDay
   const selectedTimes = selectedData ? toPrayerTimes(selectedData.timings) : []
+  const isCurrentDaySelected = selectedDay === currentDay
+  const currentPrayerName = isCurrentDaySelected ? getCurrentPrayerName(selectedTimes, toCurrentMinutes(currentTime)) : undefined
   const monthLeadingBlanks = useMemo(() => {
     const firstDay = prayerData[0]
     if (!firstDay) return 0
@@ -57,12 +59,13 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
           {prayerData.map((day) => {
             const dayNumber = Number(day.date.gregorian.day)
             const isSelected = dayNumber === selectedDay
+            const isCurrentDayCell = dayNumber === currentDay
             return (
               <button
                 key={dayNumber}
                 type="button"
                 onClick={() => setSelectedDay(dayNumber)}
-                className={`rounded-2xl border p-2 text-left transition ${isSelected ? 'border-slate-500 bg-slate-100' : 'border-slate-200 hover:bg-slate-100/70'
+                className={`rounded-2xl border p-2 text-left transition ${isSelected ? 'border-slate-500 bg-slate-100' : isCurrentDayCell ? 'border-emerald-300 bg-emerald-50/60' : 'border-slate-200 hover:bg-slate-100/70'
                   }`}
               >
                 <p className="text-sm font-medium">{dayNumber}</p>
@@ -82,6 +85,8 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
           gregorianLabel={`${selectedData.date.gregorian.day} ${selectedData.date.gregorian.month.en}`}
           hijriLabel={`${selectedData.date.hijri.day} ${selectedData.date.hijri.month.en}`}
           times={selectedTimes}
+          isCurrentDay={isCurrentDaySelected}
+          currentPrayerName={currentPrayerName}
         />
       ) : null}
     </section>

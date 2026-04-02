@@ -23,6 +23,17 @@ export function toPrayerTimes(timings: Record<string, string>): PrayerTime[] {
   })
 }
 
+export function getCurrentPrayerName(times: PrayerTime[], currentMinutes: number): PrayerName | undefined {
+  if (times.length === 0) return undefined
+
+  const activeIndex = times.findLastIndex((item) => item.minutes <= currentMinutes)
+  return times[activeIndex >= 0 ? activeIndex : times.length - 1].name
+}
+
+export function toCurrentMinutes(currentTime: Date): number {
+  return currentTime.getHours() * 60 + currentTime.getMinutes()
+}
+
 export const toWeekdayShort = (year: string, monthName: string, day: string) => {
   const month = new Date(`${monthName} 1, ${year}`).getMonth()
   const dateValue = new Date(Number(year), month, Number(day))
