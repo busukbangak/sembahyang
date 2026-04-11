@@ -52,4 +52,4 @@ export const getMondayFirstOffset = (year: string, monthName: string, day: strin
 }
 
 export const getDayDataByDayNumber = (calendarDays: CalendarDay[], dayNumber: number) =>
-  calendarDays.find((item) => Number(item.date.gregorian.day) === dayNumber) ?? calendarDays[0]
+  calendarDays.find((item) => Number(item.date.gregorian.day) === dayNumber)

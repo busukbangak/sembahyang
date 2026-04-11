@@ -25,7 +25,7 @@ export function PrayerHeaderSection({ prayerData, currentTime, city, country }: 
         <p className="mt-2 text-sm text-slate-500">
           {dayData
             ? `${dayData.date.hijri.day}. ${dayData.date.hijri.month.en} ${dayData.date.hijri.year}`
-            : 'Loading Hijri date...'}
+            : 'N/A'}
         </p>
         <p className="text-sm text-slate-500">
           {new Intl.DateTimeFormat('de-DE', {

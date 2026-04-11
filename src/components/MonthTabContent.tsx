@@ -21,7 +21,7 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
   }, [currentDay])
 
   const fallbackDay = prayerData[0]
-  const selectedData = getDayDataByDayNumber(prayerData, selectedDay) ?? fallbackDay
+  const selectedData = getDayDataByDayNumber(prayerData, selectedDay)
   const selectedTimes = selectedData ? toPrayerTimes(selectedData.timings) : []
   const isCurrentDaySelected = selectedDay === currentDay
   const currentPrayerName = isCurrentDaySelected ? getCurrentPrayerName(selectedTimes, toCurrentMinutes(currentTime)) : undefined
@@ -88,7 +88,11 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
           isCurrentDay={isCurrentDaySelected}
           currentPrayerName={currentPrayerName}
         />
-      ) : null}
+      ) : (
+        <article className="rounded-3xl border border-slate-200 bg-white/85 p-4 text-xs text-slate-500 shadow-[0_8px_22px_-16px_rgba(15,23,42,0.45)]">
+          N/A
+        </article>
+      )}
     </section>
   )
 }

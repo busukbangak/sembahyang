@@ -18,16 +18,20 @@ export function DayTabContent({ prayerData, currentTime }: DayTabContentProps) {
         Today
       </div>
       <ul className="divide-y divide-slate-200">
-        {dayTimes.map((item) => (
-          <li key={item.name} className={`flex items-center justify-between px-5 py-4 text-lg ${item.name === currentPrayerName ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700'}`}>
-            <div>
-              <p className="font-semibold">{displayPrayerName(item.name)}</p>
-            </div>
-            <span className={item.name === currentPrayerName ? 'text-emerald-800' : 'text-slate-700'}>
-              {item.time}
-            </span>
-          </li>
-        ))}
+        {dayTimes.length > 0 ? (
+          dayTimes.map((item) => (
+            <li key={item.name} className={`flex items-center justify-between px-5 py-4 text-lg ${item.name === currentPrayerName ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700'}`}>
+              <div>
+                <p className="font-semibold">{displayPrayerName(item.name)}</p>
+              </div>
+              <span className={item.name === currentPrayerName ? 'text-emerald-800' : 'text-slate-700'}>
+                {item.time}
+              </span>
+            </li>
+          ))
+        ) : (
+          <li className="px-5 py-4 text-sm text-slate-500">N/A</li>
+        )}
       </ul>
     </section>
   )

@@ -63,7 +63,7 @@ export function WeekTabContent({ prayerData, currentTime }: WeekTabContentProps)
             gregorianLabel={gregorianLabel}
             hijriLabel={hijriLabel}
             times={times}
-            emptyMessage="Current data is not available for this day."
+            emptyMessage="N/A"
             isCurrentDay={isCurrentDay}
             currentPrayerName={currentPrayerName}
           />
