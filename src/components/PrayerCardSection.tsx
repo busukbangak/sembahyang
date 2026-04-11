@@ -63,11 +63,11 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
         <div className="relative">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Now</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">From</p>
               <p className="mt-1 text-[30px] font-semibold leading-none tracking-[-0.02em]">
                 {displayPrayerName(timeline.current.name)}
               </p>
-              <p className="mt-1 text-base text-slate-600">until {timeline.next.time}</p>
+              <p className="mt-1 text-base text-slate-600">from {timeline.current.time}</p>
             </div>
             <div className="text-right">
               <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Next</p>
