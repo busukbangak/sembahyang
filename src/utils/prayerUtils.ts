@@ -23,6 +23,17 @@ export function toPrayerTimes(timings: Record<string, string>): PrayerTime[] {
   })
 }
 
+export function getSunriseTime(timings: Record<string, string>): string | undefined {
+  const raw = timings.Sunrise
+  if (!raw) return undefined
+  console.log(raw)
+  const time = raw.split(' ')[0]
+  const [h, m] = time.split(':').map(Number)
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return undefined
+
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+}
+
 export function getCurrentPrayerName(times: PrayerTime[], currentMinutes: number): PrayerName | undefined {
   if (times.length === 0) return undefined
 

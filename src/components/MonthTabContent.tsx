@@ -1,6 +1,6 @@
 
 import type { CalendarDay } from '../services/aladhanService'
-import { getCurrentPrayerName, getDayDataByDayNumber, toCurrentMinutes, toWeekdayShort, toPrayerTimes } from '../utils/prayerUtils'
+import { getCurrentPrayerName, getDayDataByDayNumber, getSunriseTime, toCurrentMinutes, toWeekdayShort, toPrayerTimes } from '../utils/prayerUtils'
 import { useEffect, useMemo, useState } from 'react'
 import { getMondayFirstOffset } from '../utils/prayerUtils'
 import { PrayerDetailsCard } from './PrayerDetailsCard'
@@ -23,6 +23,7 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
   const fallbackDay = prayerData[0]
   const selectedData = getDayDataByDayNumber(prayerData, selectedDay)
   const selectedTimes = selectedData ? toPrayerTimes(selectedData.timings) : []
+  const selectedSunriseTime = selectedData ? getSunriseTime(selectedData.timings) : undefined
   const isCurrentDaySelected = selectedDay === currentDay
   const currentPrayerName = isCurrentDaySelected ? getCurrentPrayerName(selectedTimes, toCurrentMinutes(currentTime)) : undefined
   const monthLeadingBlanks = useMemo(() => {
@@ -85,6 +86,7 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
           gregorianLabel={`${selectedData.date.gregorian.day} ${selectedData.date.gregorian.month.en}`}
           hijriLabel={`${selectedData.date.hijri.day} ${selectedData.date.hijri.month.en}`}
           times={selectedTimes}
+          sunriseTime={selectedSunriseTime}
           isCurrentDay={isCurrentDaySelected}
           currentPrayerName={currentPrayerName}
         />

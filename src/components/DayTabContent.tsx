@@ -1,5 +1,5 @@
 import type { CalendarDay } from '../services/aladhanService'
-import { displayPrayerName, getCurrentPrayerName, getDayDataByDayNumber, toCurrentMinutes, toPrayerTimes, type PrayerTime } from '../utils/prayerUtils'
+import { displayPrayerName, getCurrentPrayerName, getDayDataByDayNumber, getSunriseTime, toCurrentMinutes, toPrayerTimes, type PrayerTime } from '../utils/prayerUtils'
 
 interface DayTabContentProps {
   prayerData: CalendarDay[]
@@ -10,6 +10,7 @@ export function DayTabContent({ prayerData, currentTime }: DayTabContentProps) {
   const currentDay = currentTime.getDate()
   const dayData = getDayDataByDayNumber(prayerData, currentDay)
   const dayTimes: PrayerTime[] = dayData ? toPrayerTimes(dayData.timings) : []
+  const sunriseTime = dayData ? getSunriseTime(dayData.timings) : undefined
   const currentPrayerName = getCurrentPrayerName(dayTimes, toCurrentMinutes(currentTime))
 
   return (
@@ -24,9 +25,14 @@ export function DayTabContent({ prayerData, currentTime }: DayTabContentProps) {
               <div>
                 <p className="font-semibold">{displayPrayerName(item.name)}</p>
               </div>
-              <span className={item.name === currentPrayerName ? 'text-emerald-800' : 'text-slate-700'}>
-                {item.time}
-              </span>
+              <div className="text-right">
+                <span className={`block leading-tight ${item.name === currentPrayerName ? 'text-emerald-800' : 'text-slate-700'}`}>
+                  {item.time}
+                </span>
+                {item.name === 'Fajr' && sunriseTime ? (
+                  <p className="text-[11px] leading-tight text-slate-500">Sunrise {sunriseTime}</p>
+                ) : null}
+              </div>
             </li>
           ))
         ) : (

@@ -1,4 +1,4 @@
-import { getCurrentPrayerName, toCurrentMinutes, toPrayerTimes, toWeekdayShort } from '../utils/prayerUtils'
+import { getCurrentPrayerName, getSunriseTime, toCurrentMinutes, toPrayerTimes, toWeekdayShort } from '../utils/prayerUtils'
 import type { CalendarDay } from '../services/aladhanService'
 import { useMemo } from 'react'
 import { PrayerDetailsCard } from './PrayerDetailsCard'
@@ -42,6 +42,7 @@ export function WeekTabContent({ prayerData, currentTime }: WeekTabContentProps)
     <section className="mt-4 space-y-3">
       {weekEntries.map(({ date, dayData }) => {
         const times = dayData ? toPrayerTimes(dayData.timings) : []
+        const sunriseTime = dayData ? getSunriseTime(dayData.timings) : undefined
         const isCurrentDay = date.toDateString() === currentTime.toDateString()
         const currentPrayerName = isCurrentDay ? getCurrentPrayerName(times, toCurrentMinutes(currentTime)) : undefined
         const dayLabel = dayData
@@ -63,6 +64,7 @@ export function WeekTabContent({ prayerData, currentTime }: WeekTabContentProps)
             gregorianLabel={gregorianLabel}
             hijriLabel={hijriLabel}
             times={times}
+            sunriseTime={sunriseTime}
             emptyMessage="N/A"
             isCurrentDay={isCurrentDay}
             currentPrayerName={currentPrayerName}

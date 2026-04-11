@@ -5,6 +5,7 @@ type PrayerDetailsCardProps = {
   gregorianLabel: string
   hijriLabel?: string
   times: PrayerTime[]
+  sunriseTime?: string
   emptyMessage?: string
   isCurrentDay?: boolean
   currentPrayerName?: PrayerName
@@ -15,6 +16,7 @@ export function PrayerDetailsCard({
   gregorianLabel,
   hijriLabel,
   times,
+  sunriseTime,
   emptyMessage,
   isCurrentDay,
   currentPrayerName,
@@ -38,7 +40,12 @@ export function PrayerDetailsCard({
               <div>
                 <p>{displayPrayerName(item.name)}</p>
               </div>
-              <span>{item.time}</span>
+              <div className="text-right">
+                <span className="block leading-tight">{item.time}</span>
+                {item.name === 'Fajr' && sunriseTime ? (
+                  <p className="text-[10px] leading-tight text-slate-500">Sunrise {sunriseTime}</p>
+                ) : null}
+              </div>
             </div>
           ))
         ) : emptyMessage ? (
