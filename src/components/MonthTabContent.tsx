@@ -1,6 +1,6 @@
 
 import type { CalendarDay } from '../services/aladhanService'
-import { getCurrentPrayerName, getDayDataByDayNumber, getSunriseTime, toCurrentMinutes, toWeekdayShort, toPrayerTimes } from '../utils/prayerUtils'
+import { getCurrentPrayerName, getDayDataByDayNumber, getSunriseTime, timeStringToMinutes, toCurrentMinutes, toWeekdayShort, toPrayerTimes } from '../utils/prayerUtils'
 import { useEffect, useMemo, useState } from 'react'
 import { getMondayFirstOffset } from '../utils/prayerUtils'
 import { PrayerDetailsCard } from './PrayerDetailsCard'
@@ -25,7 +25,7 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
   const selectedTimes = selectedData ? toPrayerTimes(selectedData.timings) : []
   const selectedSunriseTime = selectedData ? getSunriseTime(selectedData.timings) : undefined
   const isCurrentDaySelected = selectedDay === currentDay
-  const currentPrayerName = isCurrentDaySelected ? getCurrentPrayerName(selectedTimes, toCurrentMinutes(currentTime)) : undefined
+  const currentPrayerName = isCurrentDaySelected ? getCurrentPrayerName(selectedTimes, toCurrentMinutes(currentTime), selectedSunriseTime ? timeStringToMinutes(selectedSunriseTime) : undefined) : undefined
   const monthLeadingBlanks = useMemo(() => {
     const firstDay = prayerData[0]
     if (!firstDay) return 0

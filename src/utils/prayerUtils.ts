@@ -11,14 +11,20 @@ export type PrayerTime = {
 
 export const displayPrayerName = (name: PrayerName) => (name === 'Fajr' ? 'Subh' : name)
 
+export function timeStringToMinutes(time: string): number | undefined {
+  const [hours, minutes] = time.split(':').map(Number)
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return undefined
+
+  return hours * 60 + minutes
+}
+
 export function toPrayerTimes(timings: Record<string, string>): PrayerTime[] {
   return PRAYER_NAMES.map((name) => {
     const time = (timings[name] ?? '00:00').split(' ')[0]
-    const [h, m] = time.split(':').map(Number)
     return {
       name,
       time,
-      minutes: h * 60 + m,
+      minutes: timeStringToMinutes(time) ?? 0,
     }
   })
 }
@@ -26,7 +32,7 @@ export function toPrayerTimes(timings: Record<string, string>): PrayerTime[] {
 export function getSunriseTime(timings: Record<string, string>): string | undefined {
   const raw = timings.Sunrise
   if (!raw) return undefined
-  console.log(raw)
+
   const time = raw.split(' ')[0]
   const [h, m] = time.split(':').map(Number)
   if (!Number.isFinite(h) || !Number.isFinite(m)) return undefined
@@ -34,8 +40,17 @@ export function getSunriseTime(timings: Record<string, string>): string | undefi
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
-export function getCurrentPrayerName(times: PrayerTime[], currentMinutes: number): PrayerName | undefined {
+export function getCurrentPrayerName(times: PrayerTime[], currentMinutes: number, sunriseMinutes?: number): PrayerName | undefined {
   if (times.length === 0) return undefined
+
+  if (sunriseMinutes !== undefined) {
+    const fajr = times[0]
+    const dhuhr = times[1]
+
+    if (fajr?.name === 'Fajr' && dhuhr && currentMinutes >= sunriseMinutes && currentMinutes < dhuhr.minutes) {
+      return undefined
+    }
+  }
 
   const activeIndex = times.findLastIndex((item) => item.minutes <= currentMinutes)
   return times[activeIndex >= 0 ? activeIndex : times.length - 1].name

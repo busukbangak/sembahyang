@@ -1,5 +1,5 @@
 import type { CalendarDay } from '../services/aladhanService'
-import { displayPrayerName, getCurrentPrayerName, getDayDataByDayNumber, getSunriseTime, toCurrentMinutes, toPrayerTimes, type PrayerTime } from '../utils/prayerUtils'
+import { displayPrayerName, getCurrentPrayerName, getDayDataByDayNumber, getSunriseTime, timeStringToMinutes, toCurrentMinutes, toPrayerTimes, type PrayerTime } from '../utils/prayerUtils'
 
 interface DayTabContentProps {
   prayerData: CalendarDay[]
@@ -11,7 +11,7 @@ export function DayTabContent({ prayerData, currentTime }: DayTabContentProps) {
   const dayData = getDayDataByDayNumber(prayerData, currentDay)
   const dayTimes: PrayerTime[] = dayData ? toPrayerTimes(dayData.timings) : []
   const sunriseTime = dayData ? getSunriseTime(dayData.timings) : undefined
-  const currentPrayerName = getCurrentPrayerName(dayTimes, toCurrentMinutes(currentTime))
+  const currentPrayerName = getCurrentPrayerName(dayTimes, toCurrentMinutes(currentTime), sunriseTime ? timeStringToMinutes(sunriseTime) : undefined)
 
   return (
     <section className="mt-4 overflow-hidden rounded-[28px] border border-slate-200 bg-white/85 shadow-[0_8px_22px_-16px_rgba(15,23,42,0.45)]">
