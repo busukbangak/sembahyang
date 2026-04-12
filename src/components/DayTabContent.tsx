@@ -9,9 +9,20 @@ interface DayTabContentProps {
 export function DayTabContent({ prayerData, currentTime }: DayTabContentProps) {
   const currentDay = currentTime.getDate()
   const dayData = getDayDataByDayNumber(prayerData, currentDay)
-  const dayTimes: PrayerTime[] = dayData ? toPrayerTimes(dayData.timings) : []
+  const rawDayTimes: PrayerTime[] = dayData ? toPrayerTimes(dayData.timings) : []
+  const yesterdayDate = new Date(currentTime)
+  yesterdayDate.setDate(currentTime.getDate() - 1)
+  const yesterdayData = getDayDataByDayNumber(prayerData, yesterdayDate.getDate())
+  const yesterdayTimes: PrayerTime[] = yesterdayData ? toPrayerTimes(yesterdayData.timings) : []
   const sunriseTime = dayData ? getSunriseTime(dayData.timings) : undefined
-  const currentPrayerName = getCurrentPrayerName(dayTimes, toCurrentMinutes(currentTime), sunriseTime ? timeStringToMinutes(sunriseTime) : undefined)
+  const currentMinutes = toCurrentMinutes(currentTime)
+  const fajr = rawDayTimes[0]
+  const isPreFajr = fajr?.name === 'Fajr' && currentMinutes < fajr.minutes
+  const yesterdayIsha = yesterdayTimes.find((item) => item.name === 'Isha')
+
+  const dayTimes: PrayerTime[] = rawDayTimes
+
+  const currentPrayerName = getCurrentPrayerName(dayTimes, currentMinutes, sunriseTime ? timeStringToMinutes(sunriseTime) : undefined)
 
   return (
     <section className="mt-4 overflow-hidden rounded-[28px] border border-slate-200 bg-white/85 shadow-[0_8px_22px_-16px_rgba(15,23,42,0.45)]">
@@ -31,6 +42,8 @@ export function DayTabContent({ prayerData, currentTime }: DayTabContentProps) {
                 </span>
                 {item.name === 'Fajr' && sunriseTime ? (
                   <p className="text-[11px] leading-tight text-slate-500">Sunrise {sunriseTime}</p>
+                ) : item.name === 'Isha' && isPreFajr && yesterdayIsha ? (
+                  <p className="text-[11px] leading-tight text-slate-500">Yesterday: {yesterdayIsha.time}</p>
                 ) : null}
               </div>
             </li>

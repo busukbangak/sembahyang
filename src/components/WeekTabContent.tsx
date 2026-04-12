@@ -1,4 +1,4 @@
-import { getCurrentPrayerName, getSunriseTime, timeStringToMinutes, toCurrentMinutes, toPrayerTimes, toWeekdayShort } from '../utils/prayerUtils'
+import { getCurrentPrayerName, getDayDataByDayNumber, getSunriseTime, timeStringToMinutes, toCurrentMinutes, toPrayerTimes, toWeekdayShort } from '../utils/prayerUtils'
 import type { CalendarDay } from '../services/aladhanService'
 import { useMemo } from 'react'
 import { PrayerDetailsCard } from './PrayerDetailsCard'
@@ -44,7 +44,16 @@ export function WeekTabContent({ prayerData, currentTime }: WeekTabContentProps)
         const times = dayData ? toPrayerTimes(dayData.timings) : []
         const sunriseTime = dayData ? getSunriseTime(dayData.timings) : undefined
         const isCurrentDay = date.toDateString() === currentTime.toDateString()
-        const currentPrayerName = isCurrentDay ? getCurrentPrayerName(times, toCurrentMinutes(currentTime), sunriseTime ? timeStringToMinutes(sunriseTime) : undefined) : undefined
+        const currentMinutes = toCurrentMinutes(currentTime)
+        const currentPrayerName = isCurrentDay ? getCurrentPrayerName(times, currentMinutes, sunriseTime ? timeStringToMinutes(sunriseTime) : undefined) : undefined
+        const fajr = times[0]
+        const isPreFajrCurrentDay = isCurrentDay && fajr?.name === 'Fajr' && currentMinutes < fajr.minutes
+        const yesterdayDate = new Date(date)
+        yesterdayDate.setDate(date.getDate() - 1)
+        const yesterdayData = getDayDataByDayNumber(prayerData, yesterdayDate.getDate())
+        const yesterdayIshaTime = isPreFajrCurrentDay && yesterdayData
+          ? toPrayerTimes(yesterdayData.timings).find((item) => item.name === 'Isha')?.time
+          : undefined
         const dayLabel = dayData
           ? toWeekdayShort(
               dayData.date.gregorian.year,
@@ -65,6 +74,7 @@ export function WeekTabContent({ prayerData, currentTime }: WeekTabContentProps)
             hijriLabel={hijriLabel}
             times={times}
             sunriseTime={sunriseTime}
+            yesterdayIshaTime={yesterdayIshaTime}
             emptyMessage="N/A"
             isCurrentDay={isCurrentDay}
             currentPrayerName={currentPrayerName}

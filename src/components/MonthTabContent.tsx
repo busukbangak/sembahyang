@@ -25,7 +25,16 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
   const selectedTimes = selectedData ? toPrayerTimes(selectedData.timings) : []
   const selectedSunriseTime = selectedData ? getSunriseTime(selectedData.timings) : undefined
   const isCurrentDaySelected = selectedDay === currentDay
-  const currentPrayerName = isCurrentDaySelected ? getCurrentPrayerName(selectedTimes, toCurrentMinutes(currentTime), selectedSunriseTime ? timeStringToMinutes(selectedSunriseTime) : undefined) : undefined
+  const currentMinutes = toCurrentMinutes(currentTime)
+  const currentPrayerName = isCurrentDaySelected ? getCurrentPrayerName(selectedTimes, currentMinutes, selectedSunriseTime ? timeStringToMinutes(selectedSunriseTime) : undefined) : undefined
+  const selectedFajr = selectedTimes[0]
+  const isPreFajrCurrentDay = isCurrentDaySelected && selectedFajr?.name === 'Fajr' && currentMinutes < selectedFajr.minutes
+  const yesterdayDate = new Date(currentTime)
+  yesterdayDate.setDate(currentTime.getDate() - 1)
+  const yesterdayData = getDayDataByDayNumber(prayerData, yesterdayDate.getDate())
+  const yesterdayIshaTime = isPreFajrCurrentDay && yesterdayData
+    ? toPrayerTimes(yesterdayData.timings).find((item) => item.name === 'Isha')?.time
+    : undefined
   const monthLeadingBlanks = useMemo(() => {
     const firstDay = prayerData[0]
     if (!firstDay) return 0
@@ -87,6 +96,7 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
           hijriLabel={`${selectedData.date.hijri.day} ${selectedData.date.hijri.month.en}`}
           times={selectedTimes}
           sunriseTime={selectedSunriseTime}
+          yesterdayIshaTime={yesterdayIshaTime}
           isCurrentDay={isCurrentDaySelected}
           currentPrayerName={currentPrayerName}
         />

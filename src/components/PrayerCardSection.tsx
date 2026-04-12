@@ -15,10 +15,14 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
   const tomorrowDate = new Date(currentTime)
   tomorrowDate.setDate(currentTime.getDate() + 1)
   const tomorrowData = getDayDataByDayNumber(prayerData, tomorrowDate.getDate())
+  const yesterdayDate = new Date(currentTime)
+  yesterdayDate.setDate(currentTime.getDate() - 1)
+  const yesterdayData = getDayDataByDayNumber(prayerData, yesterdayDate.getDate())
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes()
 
   const dayTimes: PrayerTime[] = useMemo(() => (dayData ? toPrayerTimes(dayData.timings) : []), [dayData])
   const tomorrowTimes: PrayerTime[] = useMemo(() => (tomorrowData ? toPrayerTimes(tomorrowData.timings) : []), [tomorrowData])
+  const yesterdayTimes: PrayerTime[] = useMemo(() => (yesterdayData ? toPrayerTimes(yesterdayData.timings) : []), [yesterdayData])
   const isSunriseGap =
     sunriseMinutes != null &&
     dayTimes[1] !== undefined &&
@@ -28,7 +32,6 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
   const timeline = useMemo(() => {
     if (dayTimes.length === 0) {
       return {
-        currentIndex: -1,
         current: null as PrayerTime | null,
         next: null as PrayerTime | null,
         nextLabel: null as string | null,
@@ -41,15 +44,30 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
     const currentIndex = dayTimes.findLastIndex((item) => item.minutes <= currentMinutes)
     const safeCurrentIndex = currentIndex >= 0 ? currentIndex : dayTimes.length - 1
     const nextIndex = (safeCurrentIndex + 1) % dayTimes.length
+    const fajr = dayTimes[0]
+    const isPreFajr = fajr?.name === 'Fajr' && currentMinutes < fajr.minutes
 
-    const current = dayTimes[safeCurrentIndex]
+    let current = dayTimes[safeCurrentIndex]
     const isWrapToNextDay = nextIndex === 0
     let next: PrayerTime | null = dayTimes[nextIndex]
     let nextLabel = next ? displayPrayerName(next.name) : null as string | null
     let nextTime = next ? next.time : null as string | null
 
-    const currentStart = current.minutes
+    let currentStart = current.minutes
     let nextStart = next.minutes <= currentStart ? next.minutes + 24 * 60 : next.minutes
+
+    if (isPreFajr) {
+      const yesterdayIsha = yesterdayTimes.find((item) => item.name === 'Isha')
+      if (yesterdayIsha) {
+        current = yesterdayIsha
+        currentStart = yesterdayIsha.minutes
+      }
+
+      next = fajr
+      nextLabel = displayPrayerName(fajr.name)
+      nextTime = fajr.time
+      nextStart = fajr.minutes + 24 * 60
+    }
 
     const isBetweenSunriseAndDhuhr =
       sunriseMinutes != null &&
@@ -62,7 +80,6 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
       const dhuhr = dayTimes[1]
       const sunriseStart = sunriseMinutes
       return {
-        currentIndex: -1,
         current: null as PrayerTime | null,
         next: dhuhr,
         nextLabel: displayPrayerName(dhuhr.name),
@@ -80,7 +97,7 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
       nextStart = sunriseMinutes <= currentStart ? sunriseMinutes + 24 * 60 : sunriseMinutes
     }
 
-    if (isWrapToNextDay && current.name !== 'Fajr') {
+    if (isWrapToNextDay && current.name !== 'Fajr' && !isPreFajr) {
       if (tomorrowTimes.length > 0) {
         next = tomorrowTimes[0]
         nextLabel = displayPrayerName(tomorrowTimes[0].name)
@@ -95,7 +112,6 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
 
     if (!next && !nextLabel) {
       return {
-        currentIndex: safeCurrentIndex,
         current,
         next,
         nextLabel: null as string | null,
@@ -111,7 +127,6 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
     const progress = Math.min(Math.max((elapsed / span) * 100, 0), 100)
 
     return {
-      currentIndex: safeCurrentIndex,
       current,
       next,
       nextLabel,
@@ -119,7 +134,7 @@ export function PrayerCardSection({ prayerData, currentTime }: DayTimelineCardPr
       progress,
       startsIn: nextStart - nowNormalized,
     }
-  }, [dayTimes, tomorrowTimes, currentMinutes, sunriseMinutes, sunriseTime])
+  }, [dayTimes, tomorrowTimes, yesterdayTimes, currentMinutes, sunriseMinutes, sunriseTime])
 
 
   const formatStartsIn = (minutes: number) => {
