@@ -15,7 +15,7 @@ export default defineConfig({
         name: 'Sembahyang',
         short_name: 'Sembahyang',
         description: 'Prayer times app',
-        theme_color: '#10b981',
+        theme_color: '#f8fafc',
         background_color: '#f8fafc',
         display: 'standalone',
         start_url: '/',
