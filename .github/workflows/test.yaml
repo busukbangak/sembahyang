@@ -13,8 +13,6 @@ jobs:
       image: node:20
     steps:
       - uses: actions/checkout@v4
-        with:
-          node-version: "20"
       - run: npm ci
       - run: npm test
-      - run: run build
+      - run: npm run build
