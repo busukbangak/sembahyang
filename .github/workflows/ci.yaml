@@ -1,4 +1,4 @@
-name: Test
+name: CI
 on:
   push:
     branches:
@@ -13,6 +13,7 @@ jobs:
       image: node:20
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
-      - run: npm test
+      - run: npm ci --legacy-peer-deps
       - run: npm run build
+      - run: npm run lint
+      - run: npm test
