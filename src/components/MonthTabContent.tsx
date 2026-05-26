@@ -16,7 +16,10 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
   const currentDay = currentTime.getDate()
   const [selectedDay, setSelectedDay] = useState<number>(currentDay)
 
+
   useEffect(() => {
+    // TODO: remove this later and find other solution
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedDay(currentDay)
   }, [currentDay])
 
@@ -45,7 +48,7 @@ export function MonthTabContent({ prayerData, currentTime }: MonthTabContentProp
       firstDay.date.gregorian.day,
     )
   }, [prayerData])
-  
+
   return (
     <section className="mt-4 space-y-3">
       <article className="rounded-3xl border border-slate-200 bg-white/85 p-4 shadow-[0_8px_22px_-16px_rgba(15,23,42,0.45)]">
