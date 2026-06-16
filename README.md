@@ -6,7 +6,6 @@ Minimal prayer times app built with React + TypeScript + Vite.
 
 - Prayer times for any city using the Aladhan API
 - Minimal UI built with React + TypeScript
-- Fast development with Vite
 
 ## API
 
