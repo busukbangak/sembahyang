@@ -8,6 +8,9 @@ on:
 jobs:
   preview:
     runs-on: ubuntu-latest
+    # Reuses the Vercel secrets scoped to the "Production" environment.
+    # The actual Vercel deploy below is still a preview (no --prod flag).
+    environment: production
     steps:
       - uses: actions/checkout@v4
 
