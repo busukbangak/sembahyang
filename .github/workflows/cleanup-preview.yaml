@@ -1,0 +1,45 @@
+name: Cleanup Preview
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    # Same environment as the preview deploy, to reuse the Vercel secrets.
+    environment: production
+    steps:
+      - name: Find preview URL in PR comments
+        id: get_url
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const previewComment = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body.includes('Preview deployment ready')
+            );
+            if (!previewComment) {
+              core.setOutput('url', '');
+              return;
+            }
+            const match = previewComment.body.match(/https:\/\/[a-zA-Z0-9.-]+\.vercel\.app/);
+            core.setOutput('url', match ? match[0] : '');
+
+      - name: Remove preview deployment
+        if: steps.get_url.outputs.url != ''
+        run: |
+          npm install --global vercel@latest
+          vercel remove ${{ steps.get_url.outputs.url }} --yes --safe --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
